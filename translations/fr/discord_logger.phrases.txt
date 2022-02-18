@@ -1,0 +1,112 @@
+"Phrases"
+{
+	"player_join"
+	{
+		"#format" "{1:N},{2:s}"
+		"fr"	"Le joueur {1} {2} vient de se connecter."
+	}
+	"player_left"
+	{
+		"#format" "{1:N},{2:s}"
+		"fr"	"Le joueur {1} {2} vient de se déconnecter."
+	}
+	"server_start"
+	{
+		"fr"	"Le serveur a été démarré."
+	}
+	"server_shutdown"
+	{
+		"fr"	"Le serveur a été étteint."
+	}
+	"map_init"
+	{
+		"#format" "{1:s}"
+		"fr"	"Initialisation de la map: {1:s}."
+	}
+	"auth_connect"
+	{
+		"fr"	"Connexion"
+	}
+	"auth_disconnect"
+	{
+		"fr"	"Déconnexion"
+	}
+	"ungag"
+	{
+		"fr"	"Ungagged"
+	}
+	"gag"
+	{
+		"fr"	"Gagged"
+	}
+	"ungag"
+	{
+		"fr"	"Ungagged"
+	}
+	"field_status"
+	{
+		"fr"	"Status"
+	}
+	"field_map"
+	{
+		"fr"	"Lancement de map"
+	}
+	"field_auth"
+	{
+		"fr"	"Auth"
+	}
+	"field_player"
+	{
+		"fr"	"Joueur"
+	}
+	"field_message"
+	{
+		"fr"	"Message"
+	}
+	"field_killer"
+	{
+		"fr"	"Tueur"
+	}
+	"field_victim"
+	{
+		"fr"	"Victime"
+	}
+	"field_weapon"
+	{
+		"fr"	"Arme"
+	}
+	"field_country"
+	{
+		"fr"	"Pays"
+	}
+	"field_steamid"
+	{
+		"fr"	"SteamID"
+	}
+	"field_ip"
+	{
+		"fr"	"IP"
+	}
+	"field_raison"
+	{
+		"fr"	"Raison"
+	}
+	"field_time"
+	{
+		"fr"	"Time"
+	}
+	"field_admin"
+	{
+		"fr"	"Admin"
+	}
+	"onsay_no_embed"
+	{
+		"#format" "{1:N},{2:s}"
+		"fr"	"{1}: {2}"
+	}
+	"ondeath_no_embed"
+	{
+		"#format" "{1:N},{2:N},{3:s}"
+		"fr"	"{1} has killed {2} ({3})."
+	}
+}
