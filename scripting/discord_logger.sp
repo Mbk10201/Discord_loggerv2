@@ -3,9 +3,12 @@
 #include <smlib>
 #include <geoip>
 #include <steamworks>
-#tryinclude <sourcebanspp>
 #include <unixtime_sourcemod>
 #include <discord>
+
+#undef REQUIRE_PLUGIN
+#include <sourcebanspp>
+#define REQUIRE_PLUGIN
 
 #pragma semicolon 1
 #pragma newdecls required
