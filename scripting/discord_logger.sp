@@ -15,15 +15,15 @@ KeyValues
 char
 	g_sHostname[64],
 	g_sUsername[128];
-	
 bool
 	g_bLogIP = false,
 	g_bLogSteamID = false,
 	g_bLogCountry = false,
 	g_bEmbed = false;
-	
 ArrayList
 	g_aChannels;
+float
+	g_fTimerInfo = 0.0;
 	
 enum METHODS {
 	MAP,
@@ -95,6 +95,7 @@ public void OnPluginStart()
 		g_bLogSteamID = view_as<bool>(gKv.GetNum("log_steamid"));
 		g_bLogCountry = view_as<bool>(gKv.GetNum("log_country"));
 		g_bEmbed = view_as<bool>(gKv.GetNum("embed"));
+		g_fTimerInfo = gKv.GetFloat("informations_timer");
 		
 		if(gKv.JumpToKey("auth"))
 		{
@@ -197,8 +198,12 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
-	FindConVar("hostname").GetString(g_sHostname, sizeof(g_sHostname));
+	if(g_fTimerInfo > 0.0)
+	{
+		CreateTimer(g_fTimerInfo, Timer_Information, _, TIMER_REPEAT);
+	}
 	
+	FindConVar("hostname").GetString(g_sHostname, sizeof(g_sHostname));
 	if(g_sMethod[MAP].enabled)
 	{
 		char sMap[64];
@@ -427,10 +432,12 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 				char sField[32], sType[32];
 				
 				Format(sField, sizeof(sField), "%T", "field_player", LANG_SERVER);
+				Format(sName, sizeof(sName), "```%s```", sName);
 				Embed.AddField(sField, sName, true);
 				
 				Format(sField, sizeof(sField), "%T", "field_auth", LANG_SERVER);
 				Format(sType, sizeof(sType), "%T", "auth_disconnect", LANG_SERVER);
+				Format(sType, sizeof(sType), "```%s```", sType);
 				Embed.AddField(sField, sType, true);
 				
 				Embed.SetFooter("SM Discord Logger V2 By Benito(MbK)");
@@ -610,7 +617,7 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 			UnixToTime((GetTime() + (iTime)/60), iYear, iMonth, iDay, iHour, iMinute, iSecond, UT_TIMEZONE_CEST);
 			
 			Format(sField, sizeof(sField), "%T", "field_time", LANG_SERVER);
-			Format(time, sizeof(time), "```%02d/%02d/%d```", iDay, iMonth, iYear);
+			Format(time, sizeof(time), "```%02d/%02d/%d - %02d:%02d:%02d```", iDay, iMonth, iYear, iHour, iMinute, iSecond);
 			Embed.AddField(sField, time, true);
 			
 			Embed.SetFooter("SM Discord Logger V2 By Benito(MbK)");
@@ -683,6 +690,11 @@ void SendEmbed(DiscordWebHook hook, METHODS type)
 	
 	hook.Send();
 	delete hook;
+}
+
+public Action Timer_Information(Handle timer)
+{
+	
 }
 
 void GetChannelData(char[] channel, CHANNELDATA type, char[] buffer, int maxlength)
