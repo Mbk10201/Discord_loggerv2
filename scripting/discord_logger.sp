@@ -14,11 +14,13 @@ KeyValues
 	gKv;
 char
 	g_sHostname[64],
+	g_sTitleLink[128],
 	g_sUsername[128];
 bool
 	g_bLogIP = false,
 	g_bLogSteamID = false,
 	g_bLogCountry = false,
+	g_bLogConnectIP = false,
 	g_bEmbed = false;
 ArrayList
 	g_aChannels;
@@ -34,7 +36,8 @@ enum METHODS {
 	UNBAN,
 	CHAT,
 	KILL,
-	GAG
+	GAG,
+	INFO
 }
 
 enum CHANNELDATA {
@@ -52,6 +55,7 @@ MethodData g_sMethod[METHODS];
 enum struct PlayerData {
 	char IP[64];
 	char SteamID[32];
+	bool IsInDisconnectQueue;
 }
 PlayerData g_sPlayer[MAXPLAYERS + 1];
 
@@ -91,9 +95,11 @@ public void OnPluginStart()
 	if(gKv.JumpToKey("settings"))
 	{
 		gKv.GetString("username", g_sUsername, sizeof(g_sUsername));
+		gKv.GetString("title_link", g_sTitleLink, sizeof(g_sTitleLink));
 		g_bLogIP = view_as<bool>(gKv.GetNum("log_ip"));
 		g_bLogSteamID = view_as<bool>(gKv.GetNum("log_steamid"));
 		g_bLogCountry = view_as<bool>(gKv.GetNum("log_country"));
+		g_bLogConnectIP = view_as<bool>(gKv.GetNum("log_ipconnect"));
 		g_bEmbed = view_as<bool>(gKv.GetNum("embed"));
 		g_fTimerInfo = gKv.GetFloat("informations_timer");
 		
@@ -160,6 +166,15 @@ public void OnPluginStart()
 			gKv.GoBack();
 		}
 		
+		if(gKv.JumpToKey("informations"))
+		{
+			g_sMethod[INFO].enabled = view_as<bool>(gKv.GetNum("enabled"));
+			gKv.GetString("channel", g_sMethod[INFO].channel, sizeof(g_sMethod[].channel));
+			gKv.GetString("tag", g_sMethod[INFO].tag, sizeof(g_sMethod[].tag));
+			
+			gKv.GoBack();
+		}
+		
 		gKv.GoBack();
 	}
 	
@@ -176,8 +191,6 @@ public void OnPluginStart()
 		{
 			if(gKv.GetSectionName(key_path, sizeof(key_path)))
 			{
-				PrintToServer("%s", key_path);
-				
 				char sColor[16];
 				gKv.GetString("color", sColor, sizeof(sColor));
 				char sUrl[1024];
@@ -220,9 +233,7 @@ public void OnMapStart()
 			
 			Embed.SetTitle(g_sHostname);
 			
-			char sLink[64];
-			GetServerAdress(sLink, sizeof(sLink));
-			Embed.SetTitleLink(sLink);
+			Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[MAP].channel, COLOR, sColor, sizeof(sColor));
@@ -272,7 +283,7 @@ public Action Event_OnDeath(Event event, const char[] name, bool dontBroadcast)
 		weapon = "Suicide";
 	}
 	
-	if(g_sMethod[KILL].enabled)
+	if(g_sMethod[KILL].enabled && !g_sPlayer[victim].IsInDisconnectQueue)
 	{
 		char sMap[64];
 		logger_GetMap(sMap, sizeof(sMap));
@@ -288,9 +299,7 @@ public Action Event_OnDeath(Event event, const char[] name, bool dontBroadcast)
 			
 			Embed.SetTitle(g_sHostname);
 			
-			char sLink[64];
-			GetServerAdress(sLink, sizeof(sLink));
-			Embed.SetTitleLink(sLink);
+			Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[KILL].channel, COLOR, sColor, sizeof(sColor));
@@ -358,10 +367,7 @@ public Action Listener_Say(int client, char[] Cmd, int args)
 						MessageEmbed Embed = new MessageEmbed();
 						
 						Embed.SetTitle(g_sHostname);
-						
-						char sLink[64];
-						GetServerAdress(sLink, sizeof(sLink));
-						Embed.SetTitleLink(sLink);
+						Embed.SetTitleLink(g_sTitleLink);
 						
 						char sColor[32];
 						GetChannelData(g_sMethod[CHAT].channel, COLOR, sColor, sizeof(sColor));
@@ -407,6 +413,8 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			
 		if(client != 0)
 		{
+			g_sPlayer[client].IsInDisconnectQueue = true;
+			
 			char country[64];
 			GetCountryPrefix(client, country, sizeof(country));
 			
@@ -420,10 +428,7 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 				MessageEmbed Embed = new MessageEmbed();
 				
 				Embed.SetTitle(g_sHostname);
-				
-				char sLink[64];
-				GetServerAdress(sLink, sizeof(sLink));
-				Embed.SetTitleLink(sLink);
+				Embed.SetTitleLink(g_sTitleLink);
 				
 				char sColor[32];
 				GetChannelData(g_sMethod[AUTH].channel, COLOR, sColor, sizeof(sColor));
@@ -478,6 +483,8 @@ public void OnClientAuthorized(int client, const char[] auth)
 	strcopy(g_sPlayer[client].SteamID, sizeof(g_sPlayer[].SteamID), auth);
 	GetClientIP(client, g_sPlayer[client].IP, sizeof(g_sPlayer[].IP));
 	
+	g_sPlayer[client].IsInDisconnectQueue = false;
+	
 	if(g_sMethod[AUTH].enabled)
 	{
 		char name[64];
@@ -495,10 +502,7 @@ public void OnClientAuthorized(int client, const char[] auth)
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			
-			char sLink[64];
-			GetServerAdress(sLink, sizeof(sLink));
-			Embed.SetTitleLink(sLink);
+			Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[AUTH].channel, COLOR, sColor, sizeof(sColor));
@@ -507,6 +511,7 @@ public void OnClientAuthorized(int client, const char[] auth)
 			char sField[32], sType[32], sValue[64];
 			
 			Format(sField, sizeof(sField), "%T", "field_player", LANG_SERVER);
+			Format(name, sizeof(name), "```%s```", name);
 			Embed.AddField(sField, name, true);
 			
 			Format(sField, sizeof(sField), "%T", "field_auth", LANG_SERVER);
@@ -587,10 +592,7 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			
-			char sLink[64];
-			GetServerAdress(sLink, sizeof(sLink));
-			Embed.SetTitleLink(sLink);
+			Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[BANS].channel, COLOR, sColor, sizeof(sColor));
@@ -646,10 +648,7 @@ public void BaseComm_OnClientGag(int client, bool gagState)
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			
-			char sLink[64];
-			GetServerAdress(sLink, sizeof(sLink));
-			Embed.SetTitleLink(sLink);
+			Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[GAG].channel, COLOR, sColor, sizeof(sColor));
@@ -694,7 +693,62 @@ void SendEmbed(DiscordWebHook hook, METHODS type)
 
 public Action Timer_Information(Handle timer)
 {
+	char sUrl[1024];
+	GetChannelData(g_sMethod[INFO].channel, URL, sUrl, sizeof(sUrl));
 	
+	DiscordWebHook hook = new DiscordWebHook(sUrl);
+	
+	if(g_bEmbed)
+	{
+		MessageEmbed Embed = new MessageEmbed();
+		
+		Embed.SetTitle(g_sHostname);
+		
+		char sLink[64];
+		GetServerAdress(sLink, sizeof(sLink));
+		Embed.SetTitleLink(g_sTitleLink);
+		
+		char sColor[32];
+		GetChannelData(g_sMethod[INFO].channel, COLOR, sColor, sizeof(sColor));
+		Embed.SetColor(sColor);
+		
+		char sField[32], sTmp[64];
+		
+		Format(sField, sizeof(sField), "%T", "field_playerscount", LANG_SERVER);
+		Format(sTmp, sizeof(sTmp), "```%i/%i```", GetRealClientCount(), GetMaxHumanPlayers());
+		Embed.AddField(sField, sTmp, true);
+	
+		char sMap[64];
+		logger_GetMap(sMap, sizeof(sMap));
+		
+		char sGame[64], image_url[512];
+		GetGameFolderName(sGame, sizeof(sGame));
+		Format(image_url, sizeof(image_url), "https://image.gametracker.com/images/maps/160x120/%s/%s.jpg", sGame, sMap);
+		
+		Format(sMap, sizeof(sMap), "```%s```", sMap);
+		Format(sField, sizeof(sField), "%T", "field_map", LANG_SERVER);
+		Embed.AddField(sField, sMap, true);
+		
+		if(g_bLogConnectIP)
+		{
+			Format(sField, sizeof(sField), "%T", "field_connect", LANG_SERVER);
+			Embed.AddField(sField, sLink, false);
+		}
+
+		Embed.SetImage(image_url);
+		
+		Embed.SetFooter("SM Discord Logger V2 By Benito(MbK)");
+	
+		hook.Embed(Embed);
+	}
+	else
+	{
+		char sMessage[2048];
+		Format(sMessage, sizeof(sMessage), "IN DEVELOPMENT");
+		hook.SetContent(sMessage);
+	}
+	
+	SendEmbed(hook, INFO);
 }
 
 void GetChannelData(char[] channel, CHANNELDATA type, char[] buffer, int maxlength)
@@ -733,18 +787,36 @@ void logger_GetMap(char[] map, int maxlength)
 
 void GetServerAdress(char[] buffer, int maxlen)
 {
+	char sBuff[64];
 	int ip[4];
 	SteamWorks_GetPublicIP(ip);
-	if(SteamWorks_GetPublicIP(ip)) Format(buffer, sizeof(maxlen), "%d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], FindConVar("hostport").IntValue);
+	if(SteamWorks_GetPublicIP(ip)) 
+	{
+		Format(sBuff, sizeof(sBuff), "steam://connect/%d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], FindConVar("hostport").IntValue);
+		
+	}
 	else {
 		int iIPB = FindConVar("hostip").IntValue;
-		Format(buffer, sizeof(maxlen), "steam://connect/%d.%d.%d.%d:%d", iIPB >> 24 & 0x000000FF, iIPB >> 16 & 0x000000FF, iIPB >> 8 & 0x000000FF, iIPB & 0x000000FF, FindConVar("hostport").IntValue);
+		Format(sBuff, sizeof(sBuff), "steam://connect/%d.%d.%d.%d:%d", iIPB >> 24 & 0x000000FF, iIPB >> 16 & 0x000000FF, iIPB >> 8 & 0x000000FF, iIPB & 0x000000FF, FindConVar("hostport").IntValue);
 	}
+	
+	strcopy(buffer, maxlen, sBuff);
 }
 
 bool IsClientValid(int client = -1, bool bAlive = false) 
 {
 	return MaxClients >= client > 0 && IsClientConnected(client) && !IsFakeClient(client) && IsClientInGame(client) && (!bAlive || IsPlayerAlive(client)) ? true : false;
+}
+
+int GetRealClientCount()
+{
+	int count = 0;
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if(IsClientValid(i)) count++;
+	}
+
+	return count;
 }
 
 int GetCountryPrefix(int client, char[] buffer, int maxlen)
@@ -758,10 +830,17 @@ int GetCountryEmoji(int client, char[] buffer, int maxlen)
 {
 	char sPrefix[3];
 	GeoipCode2(g_sPlayer[client].IP, sPrefix);
-	char sEmoji[32];
-	Format(sEmoji, sizeof(sEmoji), ":flag_%s:", sPrefix);
-	StringToLowerCase(sEmoji);
-	strcopy(buffer, maxlen, sEmoji);
+	if(StrEqual(sPrefix, ""))
+	{
+		strcopy(buffer, maxlen, "Unknown :pirate_flag:");
+	}
+	else
+	{
+		char sEmoji[16];
+		Format(sEmoji, sizeof(sEmoji), ":flag_%s:", sPrefix);
+		StringToLowerCase(sEmoji);
+		strcopy(buffer, maxlen, sEmoji);
+	}
 }
 
 void StringToLowerCase(char[] input)
