@@ -10,6 +10,16 @@
 		"#format" "{1:N},{2:s}"
 		"en"	"Player {1} {2} has just disconnected."
 	}
+	"player_kicked"
+	{
+		"#format" "{1:N}"
+		"en"	"Player {1} has been kicked."
+	}
+	"player_banned"
+	{
+		"#format" "{1:N},{2:N},{3:s}"
+		"en"	"Player {1} has been banned by {2} for {3}."
+	}
 	"server_start"
 	{
 		"en"	"The server has been started."
@@ -51,9 +61,21 @@
 	{
 		"en"	"Map startup"
 	}
+	"field_kick"
+	{
+		"en"	"Kick"
+	}
+	"field_ban"
+	{
+		"en"	"Ban"
+	}
 	"field_auth"
 	{
 		"en"	"Auth"
+	}
+	"field_event"
+	{
+		"en"	"Event"
 	}
 	"field_player"
 	{

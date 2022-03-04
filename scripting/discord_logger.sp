@@ -414,7 +414,7 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			
 		int client = GetClientOfUserId(event.GetInt("userid"));
 			
-		if(client != 0)
+		if(client != 0 && !IsClientInKickQueue(client))
 		{
 			g_sPlayer[client].IsInDisconnectQueue = true;
 			
@@ -477,6 +477,52 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			}
 			
 			SendEmbed(hook, AUTH);
+		}
+		
+		if(IsClientInKickQueue(client))
+		{
+			char country[64];
+			GetCountryPrefix(client, country, sizeof(country));
+			
+			char sUrl[1024];
+			GetChannelData(g_sMethod[KICK].channel, URL, sUrl, sizeof(sUrl));
+			
+			DiscordWebHook hook = new DiscordWebHook(sUrl);
+			
+			if(g_bEmbed)
+			{
+				MessageEmbed Embed = new MessageEmbed();
+				
+				Embed.SetTitle(g_sHostname);
+				Embed.SetTitleLink(g_sTitleLink);
+				
+				char sColor[32];
+				GetChannelData(g_sMethod[KICK].channel, COLOR, sColor, sizeof(sColor));
+				Embed.SetColor(sColor);
+				
+				char sField[32], sType[32];
+				
+				Format(sField, sizeof(sField), "%T", "field_player", LANG_SERVER);
+				Format(sName, sizeof(sName), "```%s```", sName);
+				Embed.AddField(sField, sName, true);
+				
+				Format(sField, sizeof(sField), "%T", "field_event", LANG_SERVER);
+				Format(sType, sizeof(sType), "%T", "field_kick", LANG_SERVER);
+				Format(sType, sizeof(sType), "```%s```", sType);
+				Embed.AddField(sField, sType, true);
+				
+				Embed.SetFooter("SM Discord Logger V2 By Benito(MbK)");
+			
+				hook.Embed(Embed);
+			}
+			else
+			{
+				char sMessage[2048];
+				Format(sMessage, sizeof(sMessage), "%T", "player_kicked", LANG_SERVER, client);
+				hook.SetContent(sMessage);
+			}
+			
+			SendEmbed(hook, KICK);
 		}
 	}
 }
@@ -601,7 +647,12 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 			GetChannelData(g_sMethod[BANS].channel, COLOR, sColor, sizeof(sColor));
 			Embed.SetColor(sColor);
 			
-			char sField[32];
+			char sField[32], sEvent[64];
+			
+			Format(sField, sizeof(sField), "%T", "field_event", LANG_SERVER);
+			Format(sEvent, sizeof(sEvent), "%T", "field_ban", LANG_SERVER);
+			Format(sEvent, sizeof(sEvent), "```%s```", sEvent);
+			Embed.AddField(sField, sEvent, true);
 			
 			Format(sField, sizeof(sField), "%T", "field_player", LANG_SERVER);
 			Format(tName, sizeof(tName), "```%s```", tName);
@@ -631,7 +682,9 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 		}
 		else
 		{
-			
+			char sMessage[2048];
+			Format(sMessage, sizeof(sMessage), "%T", "player_banned", LANG_SERVER, iTarget, iAdmin, sReason);
+			hook.SetContent(sMessage);
 		}
 		
 		SendEmbed(hook, BANS);

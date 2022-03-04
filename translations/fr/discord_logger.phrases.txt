@@ -10,6 +10,16 @@
 		"#format" "{1:N},{2:s}"
 		"fr"	"Le joueur {1} {2} vient de se déconnecter."
 	}
+	"player_kicked"
+	{
+		"#format" "{1:N}"
+		"en"	"Le joueur {1} a été kick."
+	}
+	"player_banned"
+	{
+		"#format" "{1:N},{2:N},{3:s}"
+		"en"	"Le joueur {1} a été banni par {2} pour {3}."
+	}
 	"server_start"
 	{
 		"fr"	"Le serveur a été démarré."
@@ -50,6 +60,14 @@
 	"field_map"
 	{
 		"fr"	"Lancement de map"
+	}
+	"field_kick"
+	{
+		"en"	"Kick"
+	}
+	"field_ban"
+	{
+		"en"	"Ban"
 	}
 	"field_auth"
 	{
@@ -111,6 +129,6 @@
 	"ondeath_no_embed"
 	{
 		"#format" "{1:N},{2:N},{3:s}"
-		"fr"	"{1} has killed {2} ({3})."
+		"fr"	"{1} a tué {2} ({3})."
 	}
 }
