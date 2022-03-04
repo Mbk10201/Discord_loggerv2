@@ -59,6 +59,10 @@
 	{
 		"en"	"Player"
 	}
+	"field_playerscount"
+	{
+		"en"	"Player Count"
+	}
 	"field_message"
 	{
 		"en"	"Message"
@@ -98,6 +102,10 @@
 	"field_admin"
 	{
 		"en"	"Admin"
+	}
+	"field_connect"
+	{
+		"en"	"Connect"
 	}
 	"onsay_no_embed"
 	{

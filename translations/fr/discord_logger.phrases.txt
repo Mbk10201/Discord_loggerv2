@@ -59,6 +59,10 @@
 	{
 		"fr"	"Joueur"
 	}
+	"field_playerscount"
+	{
+		"en"	"Nombre de joueurs"
+	}
 	"field_message"
 	{
 		"fr"	"Message"
