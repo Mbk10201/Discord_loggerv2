@@ -1,5 +1,4 @@
 #include <sourcemod>
-#include <cstrike>
 #include <smlib>
 #include <geoip>
 #include <steamworks>
