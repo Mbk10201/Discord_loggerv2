@@ -33,6 +33,11 @@
 		"#format" "{1:s}"
 		"en"	"Initialisation of the map: {1:s}."
 	}
+	"roundend"
+	{
+		"#format" "{1:d},{2:d}"
+		"en"	"{1} of {2} players where alive."
+	}
 	"auth_connect"
 	{
 		"en"	"Connect"
@@ -128,6 +133,10 @@
 	"field_connect"
 	{
 		"en"	"Connect"
+	}
+	"field_roundend"
+	{
+		"en"	"Round-End"
 	}
 	"onsay_no_embed"
 	{

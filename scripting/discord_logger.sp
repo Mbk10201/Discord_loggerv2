@@ -39,7 +39,8 @@ enum METHODS {
 	CHAT,
 	KILL,
 	GAG,
-	INFO
+	INFO,
+	ENDPLAYERSALIVE
 }
 
 enum CHANNELDATA {
@@ -81,6 +82,7 @@ public void OnPluginStart()
 	// Hook Game Events
 	HookEvent("player_death", Event_OnDeath, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_OnDisconnect, EventHookMode_Pre);
+	HookEvent("round_end", Event_RoundEnd, EventHookMode_Post);
 	AddCommandListener(Listener_Say, "say");
 	
 	// Register Keyvalue
@@ -173,6 +175,15 @@ public void OnPluginStart()
 			g_sMethod[INFO].enabled = view_as<bool>(gKv.GetNum("enabled"));
 			gKv.GetString("channel", g_sMethod[INFO].channel, sizeof(g_sMethod[].channel));
 			gKv.GetString("tag", g_sMethod[INFO].tag, sizeof(g_sMethod[].tag));
+			
+			gKv.GoBack();
+		}
+		
+		if(gKv.JumpToKey("roundend_playersalive"))
+		{
+			g_sMethod[ENDPLAYERSALIVE].enabled = view_as<bool>(gKv.GetNum("enabled"));
+			gKv.GetString("channel", g_sMethod[ENDPLAYERSALIVE].channel, sizeof(g_sMethod[].channel));
+			gKv.GetString("tag", g_sMethod[ENDPLAYERSALIVE].tag, sizeof(g_sMethod[].tag));
 			
 			gKv.GoBack();
 		}
@@ -523,6 +534,69 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			
 			SendEmbed(hook, KICK);
 		}
+	}
+}
+
+public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
+{
+	if(g_sMethod[ENDPLAYERSALIVE].enabled)
+	{
+		char sUrl[1024];
+		GetChannelData(g_sMethod[ENDPLAYERSALIVE].channel, URL, sUrl, sizeof(sUrl));
+		
+		DiscordWebHook hook = new DiscordWebHook(sUrl);
+		
+		int maxplayers, aliveplayers;
+		char sPlayers[512] = "";
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if(IsClientValid(i))
+			{
+				maxplayers++;
+				
+				if(IsPlayerAlive(i))
+				{
+					aliveplayers++;
+					Format(sPlayers, sizeof(sPlayers), "%s\n %i - %N", sPlayers, i);
+				}
+			}
+		}
+		
+		if(g_bEmbed)
+		{
+			MessageEmbed Embed = new MessageEmbed();
+			Embed.SetTitle(g_sHostname);
+			Embed.SetTitleLink(g_sTitleLink);
+			
+			char sColor[32];
+			GetChannelData(g_sMethod[ENDPLAYERSALIVE].channel, COLOR, sColor, sizeof(sColor));
+			Embed.SetColor(sColor);
+			
+			char sField[32], sEvent[64];
+			Format(sEvent, sizeof(sField), "%T", "roundend", LANG_SERVER, aliveplayers, maxplayers);
+			Embed.AddField("", sField, false);
+			
+			Format(sField, sizeof(sField), "%T", "field_event", LANG_SERVER);
+			Format(sEvent, sizeof(sEvent), "%T", "field_roundend", LANG_SERVER);
+			Format(sEvent, sizeof(sEvent), "```%s```", sEvent);
+			Embed.AddField(sField, sEvent, true);
+			
+			Embed.AddField("", sPlayers, false);
+			
+			Embed.SetFooter("SM Discord Logger V2 By Benito(MbK)");
+		
+			hook.Embed(Embed);
+		}
+		else
+		{
+			char sMessage[2048], sTmp[64];
+			Format(sMessage, sizeof(sMessage), "%T", "field_roundend", LANG_SERVER);
+			Format(sTmp, sizeof(sTmp), "%T", "roundend", LANG_SERVER, aliveplayers, maxplayers);
+			Format(sMessage, sizeof(sMessage), "%s \n\n %t \n\n %s", sMessage, sTmp, sPlayers);
+			hook.SetContent(sMessage);
+		}
+		
+		SendEmbed(hook, BANS);
 	}
 }
 

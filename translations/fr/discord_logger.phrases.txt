@@ -33,6 +33,11 @@
 		"#format" "{1:s}"
 		"fr"	"Initialisation de la map: {1:s}."
 	}
+	"roundend"
+	{
+		"#format" "{1:d},{2:d}"
+		"en"	"{1} sur {2} joueurs sont toujours vivants."
+	}
 	"auth_connect"
 	{
 		"fr"	"Connexion"
@@ -120,6 +125,10 @@
 	"field_admin"
 	{
 		"fr"	"Admin"
+	}
+	"field_roundend"
+	{
+		"en"	"Fin du round"
 	}
 	"onsay_no_embed"
 	{
