@@ -557,7 +557,7 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 				if(IsPlayerAlive(i))
 				{
 					aliveplayers++;
-					Format(sPlayers, sizeof(sPlayers), "%s\n %i - %N", sPlayers, i);
+					Format(sPlayers, sizeof(sPlayers), "%s\n %i - %N", sPlayers, i, i);
 				}
 			}
 		}
