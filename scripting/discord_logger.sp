@@ -100,6 +100,11 @@ public void OnPluginStart()
 	{
 		gKv.GetString("username", g_sUsername, sizeof(g_sUsername));
 		gKv.GetString("title_link", g_sTitleLink, sizeof(g_sTitleLink));
+		
+		// Set fail state if there is no http or https protocol, if there is none of them the message will not be sent due to discord conditions.
+		if(StrContains(g_sTitleLink, "http", false) == -1)
+			SetFailState("Key 'title_link' in %s is missing http / https protocol", key_path);
+		
 		g_bLogIP = view_as<bool>(gKv.GetNum("log_ip"));
 		g_bLogSteamID = view_as<bool>(gKv.GetNum("log_steamid"));
 		g_bLogCountry = view_as<bool>(gKv.GetNum("log_country"));
@@ -813,7 +818,9 @@ void SendEmbed(DiscordWebHook hook, METHODS type)
 
 	hook.SlackMode = g_bEmbed;
 	
-	hook.SetContent(g_sMethod[type].tag);
+	if(!StrEqual(g_sMethod[type].tag, ""))
+		hook.SetContent(g_sMethod[type].tag);
+	
 	hook.SetUsername(g_sUsername);
 	
 	hook.Send();
