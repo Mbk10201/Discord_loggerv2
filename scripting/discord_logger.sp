@@ -349,6 +349,8 @@ public Action Event_OnDeath(Event event, const char[] name, bool dontBroadcast)
 		
 		SendEmbed(hook, KILL);
 	}
+	
+	return Plugin_Continue;
 }
 
 public Action Listener_Say(int client, char[] Cmd, int args)
@@ -477,8 +479,8 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			{
 				char sMessage[2048];
 				char l[1], r[1], params[128];
-				l = "(";
-				r = ")";
+				Format(l, sizeof(l), "(");
+				Format(r, sizeof(r), ")");
 				
 				if(g_bLogCountry)
 				{
@@ -548,6 +550,8 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 			SendEmbed(hook, KICK);
 		}
 	}
+	
+	return Plugin_Continue;
 }
 
 public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
@@ -613,6 +617,8 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 		
 		SendEmbed(hook, BANS);
 	}
+	
+	return Plugin_Continue;
 }
 
 public void OnClientAuthorized(int client, const char[] auth) 
@@ -688,8 +694,8 @@ public void OnClientAuthorized(int client, const char[] auth)
 		{
 			char sMessage[2048];
 			char l[1], r[1], params[128];
-			l = "(";
-			r = ")";
+			Format(l, sizeof(l), "(");
+			Format(r, sizeof(r), ")");
 			
 			if(g_bLogCountry)
 			{
@@ -903,6 +909,8 @@ public Action Timer_Information(Handle timer)
 	}
 	
 	SendEmbed(hook, INFO);
+	
+	return Plugin_Handled;
 }
 
 void GetChannelData(char[] channel, CHANNELDATA type, char[] buffer, int maxlength)
@@ -973,14 +981,14 @@ int GetRealClientCount()
 	return count;
 }
 
-int GetCountryPrefix(int client, char[] buffer, int maxlen)
+void GetCountryPrefix(int client, char[] buffer, int maxlen)
 {
 	char ip[32];
 	GetClientIP(client, ip, sizeof(ip));
 	GeoipCountry(ip, buffer, maxlen);
 }
 
-int GetCountryEmoji(int client, char[] buffer, int maxlen)
+void GetCountryEmoji(int client, char[] buffer, int maxlen)
 {
 	char sPrefix[3];
 	GeoipCode2(g_sPlayer[client].IP, sPrefix);
