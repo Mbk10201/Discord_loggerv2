@@ -102,7 +102,7 @@ public void OnPluginStart()
 		gKv.GetString("title_link", g_sTitleLink, sizeof(g_sTitleLink));
 		
 		// Set fail state if there is no http or https protocol, if there is none of them the message will not be sent due to discord conditions.
-		if(StrContains(g_sTitleLink, "http", false) == -1)
+		if(StrContains(g_sTitleLink, "http", false) == -1 && !StrEqual(g_sTitleLink, ""))
 			SetFailState("Key 'title_link' in %s is missing http / https protocol", key_path);
 		
 		g_bLogIP = view_as<bool>(gKv.GetNum("log_ip"));
@@ -251,7 +251,8 @@ public void OnMapStart()
 			
 			Embed.SetTitle(g_sHostname);
 			
-			Embed.SetTitleLink(g_sTitleLink);
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[MAP].channel, COLOR, sColor, sizeof(sColor));
@@ -317,7 +318,8 @@ public Action Event_OnDeath(Event event, const char[] name, bool dontBroadcast)
 			
 			Embed.SetTitle(g_sHostname);
 			
-			Embed.SetTitleLink(g_sTitleLink);
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[KILL].channel, COLOR, sColor, sizeof(sColor));
@@ -385,7 +387,9 @@ public Action Listener_Say(int client, char[] Cmd, int args)
 						MessageEmbed Embed = new MessageEmbed();
 						
 						Embed.SetTitle(g_sHostname);
-						Embed.SetTitleLink(g_sTitleLink);
+						
+						if(!StrEqual(g_sTitleLink, ""))
+							Embed.SetTitleLink(g_sTitleLink);
 						
 						char sColor[32];
 						GetChannelData(g_sMethod[CHAT].channel, COLOR, sColor, sizeof(sColor));
@@ -446,7 +450,9 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 				MessageEmbed Embed = new MessageEmbed();
 				
 				Embed.SetTitle(g_sHostname);
-				Embed.SetTitleLink(g_sTitleLink);
+				
+				if(!StrEqual(g_sTitleLink, ""))
+					Embed.SetTitleLink(g_sTitleLink);
 				
 				char sColor[32];
 				GetChannelData(g_sMethod[AUTH].channel, COLOR, sColor, sizeof(sColor));
@@ -509,7 +515,9 @@ public Action Event_OnDisconnect(Event event, const char[] name, bool dontBroadc
 				MessageEmbed Embed = new MessageEmbed();
 				
 				Embed.SetTitle(g_sHostname);
-				Embed.SetTitleLink(g_sTitleLink);
+				
+				if(!StrEqual(g_sTitleLink, ""))
+					Embed.SetTitleLink(g_sTitleLink);
 				
 				char sColor[32];
 				GetChannelData(g_sMethod[KICK].channel, COLOR, sColor, sizeof(sColor));
@@ -571,7 +579,9 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			Embed.SetTitleLink(g_sTitleLink);
+			
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[ENDPLAYERSALIVE].channel, COLOR, sColor, sizeof(sColor));
@@ -629,7 +639,9 @@ public void OnClientAuthorized(int client, const char[] auth)
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			Embed.SetTitleLink(g_sTitleLink);
+			
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[AUTH].channel, COLOR, sColor, sizeof(sColor));
@@ -719,7 +731,9 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			Embed.SetTitleLink(g_sTitleLink);
+			
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[BANS].channel, COLOR, sColor, sizeof(sColor));
@@ -782,7 +796,9 @@ public void BaseComm_OnClientGag(int client, bool gagState)
 		{
 			MessageEmbed Embed = new MessageEmbed();
 			Embed.SetTitle(g_sHostname);
-			Embed.SetTitleLink(g_sTitleLink);
+			
+			if(!StrEqual(g_sTitleLink, ""))
+				Embed.SetTitleLink(g_sTitleLink);
 			
 			char sColor[32];
 			GetChannelData(g_sMethod[GAG].channel, COLOR, sColor, sizeof(sColor));
@@ -842,7 +858,9 @@ public Action Timer_Information(Handle timer)
 		
 		char sLink[64];
 		GetServerAdress(sLink, sizeof(sLink));
-		Embed.SetTitleLink(g_sTitleLink);
+		
+		if(!StrEqual(g_sTitleLink, ""))
+			Embed.SetTitleLink(g_sTitleLink);
 		
 		char sColor[32];
 		GetChannelData(g_sMethod[INFO].channel, COLOR, sColor, sizeof(sColor));
