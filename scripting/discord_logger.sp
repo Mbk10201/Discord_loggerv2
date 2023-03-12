@@ -20,6 +20,7 @@ char
 	g_sUsername[128];
 bool
 	g_bLogIP = false,
+	g_bLogFakePlayers = false,
 	g_bLogSteamID = false,
 	g_bLogCountry = false,
 	g_bLogConnectIP = false,
@@ -106,6 +107,7 @@ public void OnPluginStart()
 			SetFailState("Key 'title_link' in %s is missing http / https protocol", key_path);
 		
 		g_bLogIP = view_as<bool>(gKv.GetNum("log_ip"));
+		g_bLogFakePlayers = view_as<bool>(gKv.GetNum("log_fakeplayers"));
 		g_bLogSteamID = view_as<bool>(gKv.GetNum("log_steamid"));
 		g_bLogCountry = view_as<bool>(gKv.GetNum("log_country"));
 		g_bLogConnectIP = view_as<bool>(gKv.GetNum("log_ipconnect"));
@@ -623,6 +625,9 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 public void OnClientAuthorized(int client, const char[] auth) 
 {	
+	if(IsClientSourceTV(client) && IsFakeClient(client) && g_bLogFakePlayers)
+		return;
+	
 	strcopy(g_sPlayer[client].SteamID, sizeof(g_sPlayer[].SteamID), auth);
 	GetClientIP(client, g_sPlayer[client].IP, sizeof(g_sPlayer[].IP));
 	
