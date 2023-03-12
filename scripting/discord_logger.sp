@@ -625,7 +625,7 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 public void OnClientAuthorized(int client, const char[] auth) 
 {	
-	if(IsClientSourceTV(client) && IsFakeClient(client) && g_bLogFakePlayers)
+	if(IsClientSourceTV(client) && IsFakeClient(client) && !g_bLogFakePlayers)
 		return;
 	
 	strcopy(g_sPlayer[client].SteamID, sizeof(g_sPlayer[].SteamID), auth);
