@@ -136,7 +136,7 @@
 	}
 	"field_roundend"
 	{
-		"en"	"Round-End"
+		"en"	"End of the round"
 	}
 	"onsay_no_embed"
 	{

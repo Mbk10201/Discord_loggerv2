@@ -617,7 +617,7 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 			hook.SetContent(sMessage);
 		}
 		
-		SendEmbed(hook, BANS);
+		SendEmbed(hook, ENDPLAYERSALIVE);
 	}
 	
 	return Plugin_Continue;

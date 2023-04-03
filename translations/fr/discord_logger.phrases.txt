@@ -13,12 +13,12 @@
 	"player_kicked"
 	{
 		"#format" "{1:N}"
-		"en"	"Le joueur {1} a été kick."
+		"fr"	"Le joueur {1} a été kick."
 	}
 	"player_banned"
 	{
 		"#format" "{1:N},{2:N},{3:s}"
-		"en"	"Le joueur {1} a été banni par {2} pour {3}."
+		"fr"	"Le joueur {1} a été banni par {2} pour {3}."
 	}
 	"server_start"
 	{
@@ -36,7 +36,7 @@
 	"roundend"
 	{
 		"#format" "{1:d},{2:d}"
-		"en"	"{1} sur {2} joueurs sont toujours vivants."
+		"fr"	"{1} sur {2} joueurs sont toujours vivants."
 	}
 	"auth_connect"
 	{
@@ -68,11 +68,11 @@
 	}
 	"field_kick"
 	{
-		"en"	"Kick"
+		"fr"	"Kick"
 	}
 	"field_ban"
 	{
-		"en"	"Ban"
+		"fr"	"Ban"
 	}
 	"field_auth"
 	{
@@ -84,7 +84,7 @@
 	}
 	"field_playerscount"
 	{
-		"en"	"Nombre de joueurs"
+		"fr"	"Nombre de joueurs"
 	}
 	"field_message"
 	{
@@ -128,7 +128,7 @@
 	}
 	"field_roundend"
 	{
-		"en"	"Fin du round"
+		"fr"	"Fin du round"
 	}
 	"onsay_no_embed"
 	{
